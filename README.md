@@ -3,13 +3,11 @@ RSHELL
 
 Overview
 --------
-The goal of rshell is to output commands from /usr/bin. Essentially we are trying to simulate the command prompt in hammer with additional commands called connectors, ";","||",and "&&".
-Using these additional commands in tandum with /bin commands. Semicolon will execute the next set of commands no matter what. "||" will execute the next set of commands
-if the previous commands before "||" are false. "&&" will do that opposite of "||" it will execute the next commands if the previous commands. Similar to the command prompt if the user types exit
-anywhere in the command prompt, rshell will quit. Also we implemented "#" that will comment anything after out of the string or arguments. 
+The goal of rshell is to act as a command line. It works by executing commands from the /usr/bin directory, which can be chained together with "&&", "||" or ";". Comments can be made by using the "#" symbol.  
 
 How To Run
 ----------
+To download and run rshell, run these commands:
 ```
 1. git clone https://github.com/jonei005/rshell.git
 
@@ -21,12 +19,14 @@ How To Run
 
 5. bin/rshell
 ```
-Testing scripts must be run from inside the /tests directory
+Test scripts must be run from inside the /tests directory
 
 Bugs
 ----
-- exit sometimes will close the terminal that is running rshell 
-- exit will sometimes output old echoes
+- There is occasional undefined behavior with the "exit" command:
+	- Exit sometimes will close the terminal that is running rshell 
+	- Exit will sometimes output old echoes
+	- This is usually the result of running 1 or more invalid commands before "exit"
 - In multi_command.sh will sometimes keep iterating previous arguments until it reads EOF
     - This occurs only after chaining multiple connectors and running 1 or more invalid commands.
 - Semicolon must have whitespace before and after, or it wont read the semicolon
@@ -34,6 +34,7 @@ Bugs
 Authors
 -------
 Jeremy O'Neill
+
 Justin Miranda
 
 License
