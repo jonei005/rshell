@@ -40,6 +40,7 @@ Justin Miranda
 License
 -------
 Licensed under the terms of the GNU General Public License
+
 View LICENSE file for more details.
 
 

@@ -1,3 +1,6 @@
+#ifndef COMMAND_H
+#define COMMAND_H
+
 #include <string>
 #include <vector>
 #include <iostream>		// for cout program in test evaluate function
@@ -26,15 +29,17 @@ class Command : public Shell {
 	
 		Command(char** arguments)
 		 :  args(arguments), args_num(0), success(0), execute(1) {
-		 	
-			cout << "done in constructor" << endl;
 		 }
 		 
 		Command(char* arguments[], int args_num)
 		 : args(arguments), args_num(args_num), success(0), execute(1) {}
+		 
+		 ~Command() {
+		 	delete args;
+		 }
 			
 		// Main evaluate function
-		void evaluate() {
+		virtual void evaluate() {
 			
 			if (getExecute()) {
 				
@@ -122,5 +127,11 @@ class Command : public Shell {
 		void setExecute(bool newExecute) {
 			execute = newExecute;
 		}
+		
+		bool getAnySuccess() {
+			return this->succeeded();
+		}
 
 };
+
+#endif

@@ -4,20 +4,19 @@
 #include "And.h"
 #include "Or.h"
 #include "Semicolon.h"
+#include "TestCommand.h"
+#include "Parentheses.h"
 #include <string>
 #include <vector>
 #include <iostream>
 #include <cstring>
 #include <stdio.h>
 #include <cstdlib>
+#include <stack>
+#include <utility>
+#include "Functions.h"
 
 using namespace std;
-
-
-const char* and_symbol = (char*)"&&";
-const char* or_symbol = (char*)"||";
-const char* semicolon = (char*)";";
-bool connectorFound(char** arr, int i);
 
 int main() {
 		
@@ -45,16 +44,22 @@ int main() {
 		exe_args[args_num] = NULL;
 		args_num++;		// to account for the added NULL above
 
+		// String is completely parsed into exe_args
 	
 		vector<Connector*> connector_list;
 		int counter = 0;
 		
-		//for (int i = 0; i <= args_num; ++i)
+		// Store index of left parentheses found in exe_args
+		stack<pair<int,int> > parenStack;
 		
 		for (int i = 0; exe_args[i] != NULL; i++) {
 			
-			if (connectorFound(exe_args, i)) {
-				
+			if (connectorFound(exe_args, i) && parenStack.empty()) {
+				if(i == 0)
+				{
+					cout << "Syntax Error" << endl;
+					break;
+				}
 				// create char** array of exe_args with left side of connector
 				int col_size = i - counter + 1;
 				
@@ -68,25 +73,29 @@ int main() {
 				counter++;
 				
 				// create new Command with command_args
-				Command* command = new Command(command_args, col_size);
+				// Command* command;
 				
-				// create new Connector with that command as leftChild
-				if (strcmp(exe_args[i], and_symbol) == 0) {
-					And* connector = new And(command);
-					connector_list.push_back(connector);
+				// ccFunction(command_args, command, col_size);
+				
+				Connector* connector; 
+				// create new Connector with a shell as a leftChild using findShell
+				if (strcmp(exe_args[i], (char*)"&&") == 0) {
+					Shell* leftC = findShell(command_args);
+					connector = new And(leftC);
 				}
-				else if (strcmp(exe_args[i], or_symbol) == 0) {
-					Or* connector = new Or(command);
-					connector_list.push_back(connector);
-
+				else if (strcmp(exe_args[i], (char*)"||") == 0) {
+					Shell* leftC = findShell(command_args);
+					connector = new Or(leftC);
 				}
-				else if (strcmp(exe_args[i], semicolon) == 0) {
-					Semicolon* connector = new Semicolon(command);
-					connector_list.push_back(connector);
+				else if (strcmp(exe_args[i], (char*)";") == 0) {
+					Shell* leftC = findShell(command_args);
+					connector = new Semicolon(leftC);
 				}
 				else {
 					exit(-1);
 				}
+				//delete[] command_args;	// erroR?
+				connector_list.push_back(connector);
 				
 			}
 			
@@ -98,11 +107,35 @@ int main() {
 				args_num = i+1;
 				break;
 			}
+			
+			// exe_args[i] is not a connector or #, check for parentheses
+			else {
+			    for (unsigned j = 0; exe_args[i][j] != '\0'; j++) {
+			        // check for left '('
+			        if (exe_args[i][j] == '(') {
+			            parenStack.push(make_pair(i, j));
+			        }
+			        
+			        // check for right ')'
+			        if (exe_args[i][j] == ')') {
+			            parenStack.pop();
+			        }
+			    }
+			}
 		}
 		
+		// Finished parsing string and creating tree
+		
 		if (connector_list.empty()) {
-			Command* command = new Command(exe_args, args_num-1);
+			
+			Shell* command = findShell(exe_args);
 			command->evaluate();
+		    
+			// Command* command;
+			
+			// ccFunction(exe_args,command,args_num);
+			
+			// command->evaluate();
 		}
 		else {
 			// there are > 0 connectors
@@ -117,12 +150,15 @@ int main() {
 			
 			command_args[col_size-1] = NULL;
 			
-			Command* command = new Command(command_args, col_size);
+			//Command* command;
+			Shell* rightC = findShell(command_args);
+			//ccFunction(command_args,command,col_size);
 			
-			connector_list.at(connector_list.size()-1)->setRightChild(command);
+			connector_list.at(connector_list.size()-1)->setRightChild(rightC);
 			
 			if (connector_list.size() >= 2) {
 				for (unsigned j = 0; j < connector_list.size()-1; j++) {
+					//Not sure if we needed rightC in here?find
 					connector_list.at(j)->setRightChild(connector_list.at(j+1));				
 				}
 			}
@@ -134,19 +170,12 @@ int main() {
 				exit(0);
 			}
 		}
+		
+	//	delete[] exe_args;
 
 	}
 		
 	return 0;
 }
 
-// checks if connector object is found at arr[i]
-bool connectorFound(char** arr, int i) {
-	
-	if (strcmp(arr[i], and_symbol) == 0 ||
-		strcmp(arr[i], or_symbol) == 0 ||
-		strcmp(arr[i], semicolon) == 0)
-	{ return true; }
-	
-	else { return false; }
-}
+

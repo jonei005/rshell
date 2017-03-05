@@ -1,23 +1,31 @@
-
+#ifndef AND_H
+#define AND_H
 
 class And : public Connector {
 
 	// Inherited from Connector:
-	// Shell* leftChild, Shell* rightChild, bool execute
+	// Shell* leftChild, Shell* rightChild, bool execute, bool anySuccess
 
 	public: 
 		
 		// Constructors
-		And() {}
+		And() : Connector() {}
 		
-		And(Command* left)
+		And(Shell* left)
 		 : Connector(left) {}
 		
-		And(Command* left, Shell* right) 
+		And(Shell* left, Shell* right) 
 		 : Connector(left, right) {}
 		
-		And(Command* left, Shell* right, bool execute)
+		And(Shell* left, Shell* right, bool execute)
 		 : Connector(left, right, execute) {}
+		 
+		 // Destructor
+		 ~And() {
+		 	cout << "Deleting AND object" << endl;
+		 	delete [] leftChild;
+		 	delete [] rightChild;
+		 }
 
 		void evaluate() {
 			// check if left child succeeded (using leftChild->success())
@@ -38,10 +46,15 @@ class And : public Connector {
 				rightChild->setExecute(0);
 				rightChild->evaluate();
 			}
-
+			
+			if (leftChild->getAnySuccess() || rightChild->getAnySuccess()) {
+				setAnySuccess(1);
+			}
+			
+			return;
 		}
 
-		void setLeftChild(Command* newChild) {
+		void setLeftChild(Shell* newChild) {
 			leftChild = newChild;
 		}
 
@@ -53,7 +66,7 @@ class And : public Connector {
 			execute = newExecute;
 		}
 		
-		Command* getLeftChild() {
+		Shell* getLeftChild() {
 			return leftChild;
 		}
 
@@ -66,3 +79,5 @@ class And : public Connector {
 		}
 
 };
+
+#endif

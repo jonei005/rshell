@@ -1,22 +1,29 @@
+#ifndef SEMICOLON_H
+#define SEMICOLON_H
 
 class Semicolon : public Connector {
 
 	// Inherited from Connector:
-	// Command* leftChild, Shell* rightChild, bool execute
+	// Command* leftChild, Shell* rightChild, bool execute, bool anySuccess
 
 	public: 
 		
 		// Constructors
-		Semicolon() {}
+		Semicolon() : Connector() {}
 		
-		Semicolon(Command* left)
+		Semicolon(Shell* left)
 		 : Connector(left) {}
 		
-		Semicolon(Command* left, Shell* right)
+		Semicolon(Shell* left, Shell* right)
 		 : Connector(left, right) {}
 		
-		Semicolon(Command* left, Shell* right, bool execute)
+		Semicolon(Shell* left, Shell* right, bool execute)
 		 : Connector(left, right, execute) {}
+		 
+		 ~Semicolon() {
+		 	delete leftChild;
+		 	delete rightChild;
+		 }
 
 		void evaluate() {
 			// no matter what left child does, evaluate right child
@@ -28,9 +35,14 @@ class Semicolon : public Connector {
 			rightChild->setExecute(1);			
 			rightChild->evaluate();
 			
+			if (leftChild->getAnySuccess() || rightChild->getAnySuccess()) {
+				setAnySuccess(1);
+			}
+			
+			return;			
 		}
 
-		void setLeftChild(Command* newChild) {
+		void setLeftChild(Shell* newChild) {
 			leftChild = newChild;
 		}
 
@@ -42,7 +54,7 @@ class Semicolon : public Connector {
 			execute = newExecute;
 		}
 		
-		Command* getLeftChild() {
+		Shell* getLeftChild() {
 			return leftChild;
 		}
 
@@ -54,3 +66,4 @@ class Semicolon : public Connector {
 			return execute;
 		}
 };
+#endif

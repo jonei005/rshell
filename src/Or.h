@@ -1,23 +1,29 @@
-
+#ifndef OR_H
+#define OR_H
 
 class Or : public Connector {
 
 	// Inherited from Connector:
-	// Command* leftChild, Shell* rightChild, bool execute
+	// Command* leftChild, Shell* rightChild, bool execute, bool anySuccess
 
 	public: 
 		
 		// Constructors
-		Or() {}
+		Or() : Connector() {}
 		
-		Or(Command* left)
+		Or(Shell* left)
 		 : Connector(left) {}
 		
-		Or(Command* left, Shell* right)
+		Or(Shell* left, Shell* right)
 		 : Connector(left, right) {}
 		
-		Or(Command* left, Shell* right, bool execute)
+		Or(Shell* left, Shell* right, bool execute)
 		 : Connector(left, right, execute) {}
+		 
+		 ~Or() {
+		 	delete leftChild;
+		 	delete rightChild;
+		 }
 
 		void evaluate() {
 			// check if left child succeeded (using leftChild->success())
@@ -38,10 +44,15 @@ class Or : public Connector {
 				rightChild->setExecute(1);				
 				rightChild->evaluate();
 			}
-
+			
+			if (leftChild->getAnySuccess() || rightChild->getAnySuccess()) {
+				setAnySuccess(1);
+			}
+			
+			return;
 		}
 
-		void setLeftChild(Command* newChild) {
+		void setLeftChild(Shell* newChild) {
 			leftChild = newChild;
 		}
 
@@ -53,7 +64,7 @@ class Or : public Connector {
 			execute = newExecute;
 		}	
 		
-		Command* getLeftChild() {
+		Shell* getLeftChild() {
 			return leftChild;
 		}
 
@@ -65,3 +76,5 @@ class Or : public Connector {
 			return execute;
 		}
 };
+
+#endif

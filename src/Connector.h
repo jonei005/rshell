@@ -10,34 +10,43 @@ class Connector : public Shell {
 	protected:
 		
 		// leftChild should always hold a command
-		Command* leftChild;
+		Shell* leftChild;
 
 		// rightChild can hold a command or connector
 		Shell* rightChild;
 
 		// execute is used to determine whether it should execute the right child, based on left child 
 		bool execute;
+		
+		// Used to determine whether any child succeeded 
+		bool anySuccess;
 
 	public: 
 		
 		// Constructors
-		Connector() {}
+		Connector() : leftChild(NULL), rightChild(NULL), execute(1), anySuccess(0) {}
 		
-		Connector(Command* left)
-		 : leftChild(left), rightChild(NULL), execute(1) {}
+		Connector(Shell* left)
+		 : leftChild(left), rightChild(NULL), execute(1), anySuccess(0) {}
 		
-		Connector(Command* left, Shell* right)
-		 : leftChild(left), rightChild(right), execute(1) {}
+		Connector(Shell* left, Shell* right)
+		 : leftChild(left), rightChild(right), execute(1), anySuccess(0) {}
 		
-		Connector(Command* left, Shell* right, bool execute)
-		 : leftChild(left), rightChild(right), execute(execute) {}
+		Connector(Shell* left, Shell* right, bool execute)
+		 : leftChild(left), rightChild(right), execute(execute), anySuccess(0) {}
+		 
+		 ~Connector() {
+		 	cout << "Deleting CONNECTOR object" << endl;
+		 	delete leftChild;
+		 	delete rightChild;
+		 }
 
 		void evaluate() {
 			// check if left child succeeded (using leftChild->success())
 			// if it succeeded, based on which connector we are in, evaluate (or don't) right child
 		}
 
-		void setLeftChild(Command* newChild) {
+		void setLeftChild(Shell* newChild) {
 			leftChild = newChild;
 		}
 
@@ -49,7 +58,7 @@ class Connector : public Shell {
 			execute = newExecute;
 		}
 
-		Command* getLeftChild() {
+		Shell* getLeftChild() {
 			return leftChild;
 		}
 
@@ -63,6 +72,19 @@ class Connector : public Shell {
 
 		bool succeeded() {
 			return leftChild->succeeded();
+		}
+		
+		bool getAnySuccess() {
+			return anySuccess;
+		}
+		
+		void setAnySuccess(bool newSuccess) {
+			anySuccess = newSuccess;
+			return;
+		}
+		
+		bool is_parentheses() {
+			return false;
 		}
 };
 
