@@ -45,6 +45,11 @@ int main() {
 		args_num++;		// to account for the added NULL above
 
 		// String is completely parsed into exe_args
+		
+		if (exe_args[0] == NULL || exe_args[0][0] == '#') {
+			// restart while loop
+			continue;
+		}
 	
 		vector<Connector*> connector_list;
 		int counter = 0;
