@@ -100,20 +100,9 @@ Shell* findShell(char** newArray) {
 				}
 			}
 		}
-			
-		//char* newerArray[i+1] = newArray + 1;
-		
-		//int counter = 0;
 		
 		int col_size = i + 1;
 		char** newerArray = new char* [col_size];
-		
-		/*
-		if (i == 1) {
-			// ( not spaced AND one word command. Example: (ls)
-			
-		}
-		*/
 		
 		if (newArray[0][1] != '\0') {
 			// ( not spaced
@@ -185,12 +174,7 @@ Shell* findShell(char** newArray) {
 			}
 			command_args[col_size-1] = NULL;
 			counter++;
-			
-			// create new Command with command_args
-			// Command* command;
-			
-			// ccFunction(command_args, command, col_size);
-			
+						
 			Connector* connector;
 			// create new Connector with a shell as a leftChild using find shell
 			if (strcmp(newArray[i], (char*)"&&") == 0) {
@@ -268,8 +252,7 @@ Shell* findShell(char** newArray) {
 			
 			counter++;
 			
-			// CHECK IF '>' EXISTS IN REST OF newArray
-
+			// check if '>' exists in rest of newArray
 			if (newArray[counter] != NULL && newArray[counter][0] == '>') {
 				// double redirector
 				bool doublearrow = 0;
@@ -315,18 +298,16 @@ Shell* findShell(char** newArray) {
 		Command* command;
 		
 		int a = i + 1;
-		ccFunction(newArray, command, a); //Not sure if i or i+1
+		ccFunction(newArray, command, a);
 		
 		return command;
 	}
 	else {
 		// connector_list.size() >= 1
 		// must add the last command to be rightChild of last connector
-		//int col_size = i + 1 - counter;
+		// int col_size = i + 1 - counter;
 		unsigned col_size = i + 1 - counter;
-		
-		//THIS FUCKER IS CAUSING ALL OUR PROBLEMS
-		
+				
 		char** command_args = new char* [col_size];
 		
 		for (int j = 0; newArray[counter] != NULL; j++) {
@@ -337,14 +318,14 @@ Shell* findShell(char** newArray) {
 		command_args[col_size-1] = NULL;
 		
 		Command* command;
-		//Shell* rightC = findShell(command_args);
-		ccFunction(command_args,command,i+1); // could be newerArray?
+
+		ccFunction(command_args,command,i+1); 
 		
 		connector_list.at(connector_list.size() - 1)->setRightChild(command);
 		
 		if (connector_list.size() >= 2) {
 			for (unsigned j = 0; j < connector_list.size()-1; j++) {
-				//Not sure if we needed rightC in here?find
+
 				connector_list.at(j)->setRightChild(connector_list.at(j+1));				
 			}
 		}

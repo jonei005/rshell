@@ -143,12 +143,7 @@ int main() {
 			
 			Shell* command = findShell(exe_args);
 			command->evaluate();
-		    
-			// Command* command;
-			
-			// ccFunction(exe_args,command,args_num);
-			
-			// command->evaluate();
+
 		}
 		else {
 			// there are > 0 connectors
@@ -163,9 +158,7 @@ int main() {
 			
 			command_args[col_size-1] = NULL;
 			
-			//Command* command;
 			Shell* rightC = findShell(command_args);
-			//ccFunction(command_args,command,col_size);
 			
 			connector_list.at(connector_list.size()-1)->setRightChild(rightC);
 			
@@ -183,8 +176,6 @@ int main() {
 				exit(0);
 			}
 		}
-		
-	//	delete[] exe_args;
 
 	}
 		
