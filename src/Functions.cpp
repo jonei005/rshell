@@ -156,12 +156,7 @@ Shell* findShell(char** newArray) {
 	
 	// Now newerArray stores entire string inside the parentheses
 	// Need to look for connector if parenStack.empty()
-	// NOTE: Print error if there's an unequal amount of parentheses
-	// NOTE: Make sure next "word" after ')' is always a connector
 	
-	
-	// counter = 0; //possible error
-		
 	// Store index of left parentheses found in exe_args
 	// stack<pair<int,int> > parenStack;
 	
@@ -210,6 +205,10 @@ Shell* findShell(char** newArray) {
 				Shell* leftC = findShell(command_args);
 				connector = new Semicolon(leftC);
 			}
+			else if (strcmp(newArray[i], (char*)"|") == 0) {
+				Shell* leftC = findShell(command_args);
+				connector = new Pipe(leftC);
+			}
 			else {
 				exit(-1);
 			}
@@ -218,6 +217,81 @@ Shell* findShell(char** newArray) {
 			
 		}
 		
+		else if (newArray[i][0] == '>') {
+			// output redirection
+			
+			int col_size = i - counter + 1;
+			char** command_args = new char* [col_size];
+			
+			// get left side
+			for (; counter < i; counter++) {
+				command_args[counter] = newArray[counter];
+			}
+			command_args[col_size-1] = NULL;
+			counter++;
+			
+			// set right side of > as filename
+			char* filename = newArray[counter];
+			
+			OutputRedirector* redirect;
+			
+			// Check if symbol is really >> or just >
+			if (newArray[i][1] == '>') {
+				// double arrow, append instead of redirect
+				redirect = new OutputRedirector(command_args, filename, true);
+			}
+			else {
+				// single arrow, overwrite file
+				redirect = new OutputRedirector(command_args, filename, false);
+			}
+			
+			counter++;
+			
+			return redirect;
+			
+		}
+		
+		else if (newArray[i][0] == '<') {
+			// input redirection
+			
+			int col_size = i - counter + 1;
+			char** command_args = new char* [col_size];
+			
+			// get left side
+			for (; counter < i; counter++) {
+				command_args[counter] = newArray[counter];
+			}
+			command_args[col_size-1] = NULL;
+			counter++;
+			
+			char* inputFilename = newArray[counter];
+			
+			counter++;
+			
+			// CHECK IF '>' EXISTS IN REST OF newArray
+
+			if (newArray[counter] != NULL && newArray[counter][0] == '>') {
+				// double redirector
+				bool doublearrow = 0;
+				if (newArray[counter][1] == '>') {
+					doublearrow = 1;
+				}
+				counter++;
+				
+				char* outputFilename = newArray[counter];
+				
+				DoubleRedirector* redirect = new DoubleRedirector(command_args, inputFilename, outputFilename, doublearrow);
+				
+				return redirect;
+				
+			}
+			else {
+				InputRedirector* redirect = new InputRedirector(command_args, inputFilename);
+				return redirect;
+			}
+
+			
+		}
 		// exe_args[i] is not a connector or #, check for parentheses
 		else {
 		    for (unsigned j = 0; newArray[i][j] != '\0'; j++) {
@@ -253,21 +327,6 @@ Shell* findShell(char** newArray) {
 		
 		//THIS FUCKER IS CAUSING ALL OUR PROBLEMS
 		
-		// #0  0x0000003e18e325e5 in raise () from /lib64/libc.so.6
-		// #1  0x0000003e18e33dc5 in abort () from /lib64/libc.so.6
-		// #2  0x0000003e23abea7d in __gnu_cxx::__verbose_terminate_handler() ()
-		//   from /usr/lib64/libstdc++.so.6
-		// #3  0x0000003e23abcbd6 in ?? () from /usr/lib64/libstdc++.so.6
-		// #4  0x0000003e23abcc03 in std::terminate() () from /usr/lib64/libstdc++.so.6
-		// #5  0x0000003e23abcd22 in __cxa_throw () from /usr/lib64/libstdc++.so.6
-		// #6  0x0000003e23abd11d in operator new(unsigned long) ()
-		//   from /usr/lib64/libstdc++.so.6
-		// #7  0x0000003e23abd1d9 in operator new[](unsigned long) ()
-		//   from /usr/lib64/libstdc++.so.6
-		// #8  0x0000000000401c17 in findShell (newArray=0x60a070) at Functions.cpp:243
-		// #9  0x000000000040182a in findShell (newArray=0x60a100) at Functions.cpp:140
-		// #10 0x0000000000405b9a in main () at rshell.cpp:131
-		
 		char** command_args = new char* [col_size];
 		
 		for (int j = 0; newArray[counter] != NULL; j++) {
@@ -299,9 +358,10 @@ Shell* findShell(char** newArray) {
 // checks if connector object is found at arr[i]
 bool connectorFound(char** arr, int i) {
 	
-	if (strcmp(arr[i], (char*)"&&") == 0 ||
+	if (strcmp(arr[i], (char*)"&&") == 0 || 
 		strcmp(arr[i], (char*)"||") == 0 ||
-		strcmp(arr[i], (char*)";") == 0)
+		strcmp(arr[i], (char*)";") == 0 ||
+		strcmp(arr[i], (char*)"|") == 0 )
 	{ return true; }
 	
 	else { return false; }

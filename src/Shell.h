@@ -29,6 +29,8 @@ class Shell {
 		virtual bool is_parentheses() {}
 		
 		virtual Shell* getRightChild() {}
+		
+		virtual int pipeEvaluate() {}
 
 };
 

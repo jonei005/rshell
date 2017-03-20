@@ -49,8 +49,6 @@ class Command : public Shell {
 				}
 				
 				// if args[0] == "exit", exit the program
-				// BUG: exits terminal if used with connector?
-				// Maybe: Try in main, throw exception here, exit() from main
 				if (strcmp(args[0], (char*)"exit") == 0) {
 					//exit(0);
 					throw 99;
@@ -99,6 +97,13 @@ class Command : public Shell {
 			}
 		}
 		
+		int pipeEvaluate() {
+			// we are already in a fork process, only have to run execvp
+			int execStatus = 0;
+			execStatus = execvp(args[0], args);
+			return execStatus;
+		}
+		
 		// Setters and getters
 		char* getProgram() {
 			return args[0];
@@ -131,6 +136,7 @@ class Command : public Shell {
 		bool getAnySuccess() {
 			return this->succeeded();
 		}
+
 
 };
 

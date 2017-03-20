@@ -86,6 +86,10 @@ class Connector : public Shell {
 		bool is_parentheses() {
 			return false;
 		}
+		
+		char** getArgs() {
+			return leftChild->getArgs();
+		}
 };
 
 #endif

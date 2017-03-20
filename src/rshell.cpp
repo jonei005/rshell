@@ -6,6 +6,11 @@
 #include "Semicolon.h"
 #include "TestCommand.h"
 #include "Parentheses.h"
+#include "Redirector.h"
+#include "InputRedirector.h"
+#include "OutputRedirector.h"
+#include "DoubleRedirector.h"
+#include "Pipe.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -56,7 +61,6 @@ int main() {
 		
 		// Store index of left parentheses found in exe_args
 		stack<pair<int,int> > parenStack;
-		
 		for (int i = 0; exe_args[i] != NULL; i++) {
 			
 			if (connectorFound(exe_args, i) && parenStack.empty()) {
@@ -96,6 +100,10 @@ int main() {
 					Shell* leftC = findShell(command_args);
 					connector = new Semicolon(leftC);
 				}
+				else if (strcmp(exe_args[i], (char*)"|") == 0) {
+					Shell* leftC = findShell(command_args);
+					connector = new Pipe(leftC);
+				}
 				else {
 					exit(-1);
 				}
@@ -112,7 +120,7 @@ int main() {
 				args_num = i+1;
 				break;
 			}
-			
+	
 			// exe_args[i] is not a connector or #, check for parentheses
 			else {
 			    for (unsigned j = 0; exe_args[i][j] != '\0'; j++) {

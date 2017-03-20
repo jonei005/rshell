@@ -7,6 +7,11 @@
 #include "Semicolon.h"
 #include "TestCommand.h"
 #include "Parentheses.h"
+#include "Redirector.h"
+#include "OutputRedirector.h"
+#include "InputRedirector.h"
+#include "DoubleRedirector.h"
+#include "Pipe.h"
 #include <string>
 #include <vector>
 #include <iostream>
